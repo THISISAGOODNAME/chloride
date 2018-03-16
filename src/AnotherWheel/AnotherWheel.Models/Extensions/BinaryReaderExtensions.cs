@@ -84,48 +84,37 @@ namespace AnotherWheel.Models.Extensions {
             return result;
         }
 
-        internal static int ReadVarLenIntAsInt32([NotNull] this BinaryReader reader, int size, bool filterMinus1 = true) {
+        // TODO: Not fully compatible: https://gist.github.com/felixjones/f8a06bd48f9da9a4539f#index-types
+        internal static int ReadVarLenIntAsInt32([NotNull] this BinaryReader reader, int size, bool unsignedUnderUInt16 = false) {
             switch (size) {
                 case 1: {
                         var value = reader.ReadByte();
 
-                        if (filterMinus1 && value == unchecked((byte)-1)) {
-                            return -1;
-                        } else {
+                        if (unsignedUnderUInt16) {
                             return value;
+                        } else {
+                            if (value == unchecked((byte)-1)) {
+                                return -1;
+                            } else {
+                                return value;
+                            }
                         }
                     }
                 case 2: {
                         var value = reader.ReadUInt16();
 
-                        if (filterMinus1 && value == unchecked((ushort)-1)) {
-                            return -1;
-                        } else {
+                        if (unsignedUnderUInt16) {
                             return value;
-                        }
-                    }
-                case 4: {
-                        var value = reader.ReadUInt32();
-
-                        if (filterMinus1 && value == unchecked((uint)-1)) {
-                            return -1;
                         } else {
-                            return unchecked((int)value);
+                            if (value == unchecked((ushort)-1)) {
+                                return -1;
+                            } else {
+                                return value;
+                            }
                         }
                     }
-                default:
-                    return 0;
-            }
-        }
-
-        internal static uint ReadVarLenIntAsUInt32([NotNull] this BinaryReader reader, int size) {
-            switch (size) {
-                case 1:
-                    return reader.ReadByte();
-                case 2:
-                    return reader.ReadUInt16();
                 case 4:
-                    return reader.ReadUInt32();
+                    return reader.ReadInt32();
                 default:
                     return 0;
             }

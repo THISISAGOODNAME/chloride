@@ -36,7 +36,7 @@ namespace AnotherWheel.Models.Pmx {
 
         public SphereMode SphereMode { get; internal set; }
 
-        public int FaceCount { get; internal set; }
+        public int AppliedFaceVertexCount { get; internal set; }
 
     }
 

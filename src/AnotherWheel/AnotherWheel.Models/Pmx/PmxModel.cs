@@ -19,8 +19,11 @@ namespace AnotherWheel.Models.Pmx {
         [NotNull, ItemNotNull]
         public IReadOnlyList<PmxVertex> Vertices { get; internal set; }
 
+        /// <summary>
+        /// Triangles, in which every int tuple (v1, v2, v3) represents a triangle.
+        /// </summary>
         [NotNull]
-        public IReadOnlyList<int> Faces { get; internal set; }
+        public IReadOnlyList<int> FaceTriangles { get; internal set; }
 
         [NotNull, ItemNotNull]
         public IReadOnlyList<PmxMaterial> Materials { get; internal set; }

@@ -102,10 +102,10 @@ namespace AnotherWheel.Models {
                 var faceIndices = new int[faceCount];
 
                 for (var i = 0; i < faceCount; ++i) {
-                    faceIndices[i] = _reader.ReadVarLenIntAsInt32(VertexElementSize);
+                    faceIndices[i] = _reader.ReadVarLenIntAsInt32(VertexElementSize, true);
                 }
 
-                model.Faces = faceIndices;
+                model.FaceTriangles = faceIndices;
             }
 
             void ReadTextureInfo() {
@@ -333,7 +333,7 @@ namespace AnotherWheel.Models {
             }
 
             material.MemoTextureFileName = ReadString() ?? string.Empty;
-            material.FaceCount = _reader.ReadInt32();
+            material.AppliedFaceVertexCount = _reader.ReadInt32();
 
             return material;
         }
@@ -438,7 +438,7 @@ namespace AnotherWheel.Models {
         private PmxVertexMorph ReadPmxVertexMorph() {
             var morph = new PmxVertexMorph();
 
-            morph.Index = _reader.ReadVarLenIntAsInt32(VertexElementSize);
+            morph.Index = _reader.ReadVarLenIntAsInt32(VertexElementSize, true);
             morph.Offset = _reader.ReadVector3();
 
             return morph;
@@ -457,7 +457,7 @@ namespace AnotherWheel.Models {
         private PmxUVMorph ReadPmxUVMorph() {
             var morph = new PmxUVMorph();
 
-            morph.Index = _reader.ReadVarLenIntAsInt32(VertexElementSize);
+            morph.Index = _reader.ReadVarLenIntAsInt32(VertexElementSize, true);
             morph.Offset = _reader.ReadVector4();
 
             return morph;
@@ -633,7 +633,7 @@ namespace AnotherWheel.Models {
             var anchor = new BodyAnchor();
 
             anchor.BodyIndex = _reader.ReadVarLenIntAsInt32(RigidBodyElementSize);
-            anchor.VertexIndex = _reader.ReadVarLenIntAsInt32(VertexElementSize);
+            anchor.VertexIndex = _reader.ReadVarLenIntAsInt32(VertexElementSize, true);
             anchor.IsNear = _reader.ReadBoolean();
 
             return anchor;
@@ -642,7 +642,7 @@ namespace AnotherWheel.Models {
         private VertexPin ReadVertexPin() {
             var pin = new VertexPin();
 
-            pin.VertexIndex = _reader.ReadVarLenIntAsInt32(VertexElementSize);
+            pin.VertexIndex = _reader.ReadVarLenIntAsInt32(VertexElementSize, true);
 
             return pin;
         }

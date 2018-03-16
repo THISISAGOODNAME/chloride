@@ -41,7 +41,7 @@ namespace AnotherWheel.Viewer {
 
             PmxModel pmxModel;
 
-            using (var fileStream = File.Open("Sample.pmx", FileMode.Open, FileAccess.Read, FileShare.Read)) {
+            using (var fileStream = File.Open("Contents/mayu.pmx", FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 pmxModel = PmxReader.ReadModel(fileStream);
             }
 

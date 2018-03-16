@@ -8,10 +8,10 @@ namespace AnotherWheel.Models.Pmx {
 
         public string NameEnglish { get; internal set; }
 
-        public bool IsSystemNode { get; internal set; }
-
         [NotNull, ItemNotNull]
         public IReadOnlyList<NodeElement> Elements { get; internal set; }
+
+        internal bool IsSystemNode { get; set; }
 
     }
 }

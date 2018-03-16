@@ -99,13 +99,13 @@ namespace AnotherWheel.Models {
 
             void ReadFaceInfo() {
                 var faceCount = _reader.ReadInt32();
-                var faceIDs = new int[faceCount];
+                var faceIndices = new int[faceCount];
 
                 for (var i = 0; i < faceCount; ++i) {
-                    faceIDs[i] = _reader.ReadVarLenSIntAsInt32(VertexElementSize, false);
+                    faceIndices[i] = _reader.ReadVarLenIntAsInt32(VertexElementSize);
                 }
 
-                model.Faces = faceIDs;
+                model.Faces = faceIndices;
             }
 
             void ReadTextureInfo() {
@@ -118,6 +118,8 @@ namespace AnotherWheel.Models {
                     textureNameMap[i] = textureName;
                     textureIndexLookup[textureName] = i;
                 }
+
+                textureNameMap[-1] = string.Empty;
 
                 TextureNameMap = textureNameMap;
                 TextureIndexLookup = textureIndexLookup;
@@ -249,29 +251,29 @@ namespace AnotherWheel.Models {
 
             switch (vertex.Deformation) {
                 case Deformation.Bdef1:
-                    vertex.BoneWeights[0].BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+                    vertex.BoneWeights[0].BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
                     vertex.BoneWeights[0].Weight = 1;
                     break;
                 case Deformation.Bdef2:
-                    vertex.BoneWeights[0].BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
-                    vertex.BoneWeights[1].BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+                    vertex.BoneWeights[0].BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
+                    vertex.BoneWeights[1].BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
                     vertex.BoneWeights[0].Weight = _reader.ReadSingle();
                     vertex.BoneWeights[1].Weight = 1 - vertex.BoneWeights[0].Weight;
                     break;
                 case Deformation.Bdef4:
                 case Deformation.Qdef:
-                    vertex.BoneWeights[0].BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
-                    vertex.BoneWeights[1].BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
-                    vertex.BoneWeights[2].BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
-                    vertex.BoneWeights[3].BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+                    vertex.BoneWeights[0].BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
+                    vertex.BoneWeights[1].BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
+                    vertex.BoneWeights[2].BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
+                    vertex.BoneWeights[3].BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
                     vertex.BoneWeights[0].Weight = _reader.ReadSingle();
                     vertex.BoneWeights[1].Weight = _reader.ReadSingle();
                     vertex.BoneWeights[2].Weight = _reader.ReadSingle();
                     vertex.BoneWeights[3].Weight = _reader.ReadSingle();
                     break;
                 case Deformation.Sdef: {
-                        vertex.BoneWeights[0].BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
-                        vertex.BoneWeights[1].BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+                        vertex.BoneWeights[0].BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
+                        vertex.BoneWeights[1].BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
                         vertex.BoneWeights[0].Weight = _reader.ReadSingle();
                         vertex.BoneWeights[1].Weight = 1 - vertex.BoneWeights[0].Weight;
 
@@ -308,16 +310,16 @@ namespace AnotherWheel.Models {
             material.EdgeColor = _reader.ReadVector4();
             material.EdgeSize = _reader.ReadSingle();
 
-            var texNameIndex = _reader.ReadVarLenSIntAsInt32(TexElementSize);
+            var texNameIndex = _reader.ReadVarLenIntAsInt32(TexElementSize);
             material.TextureFileName = TextureNameMap[texNameIndex];
-            var sphereTexNameIndex = _reader.ReadVarLenSIntAsInt32(TexElementSize);
+            var sphereTexNameIndex = _reader.ReadVarLenIntAsInt32(TexElementSize);
             material.SphereTextureFileName = TextureNameMap[sphereTexNameIndex];
             material.SphereMode = (SphereMode)_reader.ReadByte();
 
             var mappedToonTexture = _reader.ReadByte() == 0;
 
             if (mappedToonTexture) {
-                var toonTexNameIndex = _reader.ReadVarLenSIntAsInt32(TexElementSize);
+                var toonTexNameIndex = _reader.ReadVarLenIntAsInt32(TexElementSize);
                 material.ToonTextureFileName = TextureNameMap[toonTexNameIndex];
             } else {
                 var toonTexIndex = (int)_reader.ReadByte();
@@ -339,7 +341,7 @@ namespace AnotherWheel.Models {
         private IKLink ReadIKLink() {
             var link = new IKLink();
 
-            link.BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+            link.BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
             link.IsLimited = _reader.ReadBoolean();
 
             if (link.IsLimited) {
@@ -353,7 +355,7 @@ namespace AnotherWheel.Models {
         private PmxIK ReadPmxIK() {
             var ik = new PmxIK();
 
-            ik.TargetBoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+            ik.TargetBoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
             ik.LoopCount = _reader.ReadInt32();
             ik.Angle = _reader.ReadSingle();
 
@@ -375,18 +377,18 @@ namespace AnotherWheel.Models {
             bone.Name = ReadString() ?? string.Empty;
             bone.NameEnglish = ReadString() ?? string.Empty;
             bone.Position = _reader.ReadVector3();
-            bone.ParentBoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+            bone.ParentBoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
             bone.Level = _reader.ReadInt32();
             bone.Flags = (BoneFlags)_reader.ReadUInt16();
 
             if (bone.HasFlag(BoneFlags.ToBone)) {
-                bone.To_Bone = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+                bone.To_Bone = _reader.ReadVarLenIntAsInt32(BoneElementSize);
             } else {
                 bone.To_Offset = _reader.ReadVector3();
             }
 
             if (bone.HasFlag(BoneFlags.AppendRotation) || bone.HasFlag(BoneFlags.AppendTranslation)) {
-                bone.AppendParentBoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+                bone.AppendParentBoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
                 bone.AppendRatio = _reader.ReadSingle();
             }
 
@@ -413,7 +415,7 @@ namespace AnotherWheel.Models {
             }
 
             if (bone.HasFlag(BoneFlags.ExtParent)) {
-                bone.ExtKey = _reader.ReadInt32();
+                bone.ExternalParentIndex = _reader.ReadInt32();
             }
 
             if (bone.HasFlag(BoneFlags.IK)) {
@@ -427,7 +429,7 @@ namespace AnotherWheel.Models {
         private PmxGroupMorph ReadPmxGroupMorph() {
             var morph = new PmxGroupMorph();
 
-            morph.Index = _reader.ReadVarLenSIntAsInt32(MorphElementSize);
+            morph.Index = _reader.ReadVarLenIntAsInt32(MorphElementSize);
             morph.Ratio = _reader.ReadSingle();
 
             return morph;
@@ -436,7 +438,7 @@ namespace AnotherWheel.Models {
         private PmxVertexMorph ReadPmxVertexMorph() {
             var morph = new PmxVertexMorph();
 
-            morph.Index = _reader.ReadVarLenSIntAsInt32(MorphElementSize);
+            morph.Index = _reader.ReadVarLenIntAsInt32(VertexElementSize);
             morph.Offset = _reader.ReadVector3();
 
             return morph;
@@ -445,7 +447,7 @@ namespace AnotherWheel.Models {
         private PmxBoneMorph ReadPmxBoneMorph() {
             var morph = new PmxBoneMorph();
 
-            morph.Index = _reader.ReadVarLenSIntAsInt32(MorphElementSize);
+            morph.Index = _reader.ReadVarLenIntAsInt32(BoneElementSize);
             morph.Translation = _reader.ReadVector3();
             morph.Rotation = _reader.ReadVector4();
 
@@ -455,7 +457,7 @@ namespace AnotherWheel.Models {
         private PmxUVMorph ReadPmxUVMorph() {
             var morph = new PmxUVMorph();
 
-            morph.Index = _reader.ReadVarLenSIntAsInt32(MorphElementSize);
+            morph.Index = _reader.ReadVarLenIntAsInt32(VertexElementSize);
             morph.Offset = _reader.ReadVector4();
 
             return morph;
@@ -464,7 +466,7 @@ namespace AnotherWheel.Models {
         private PmxMaterialMorph ReadPmxMaterialMorph() {
             var morph = new PmxMaterialMorph();
 
-            morph.Index = _reader.ReadVarLenSIntAsInt32(MorphElementSize);
+            morph.Index = _reader.ReadVarLenIntAsInt32(MaterialElementSize);
             morph.Op = (MorphOp)_reader.ReadByte();
             morph.Diffuse = _reader.ReadVector4();
             morph.Specular = _reader.ReadVector3();
@@ -482,7 +484,7 @@ namespace AnotherWheel.Models {
         private PmxImpulseMorph ReadPmxImpulseMorph() {
             var morph = new PmxImpulseMorph();
 
-            morph.Index = _reader.ReadVarLenSIntAsInt32(MorphElementSize);
+            morph.Index = _reader.ReadVarLenIntAsInt32(RigidBodyElementSize);
             morph.IsLocal = _reader.ReadBoolean();
             morph.Velocity = _reader.ReadVector3();
             morph.Torque = _reader.ReadVector3();
@@ -548,10 +550,10 @@ namespace AnotherWheel.Models {
 
             switch (nodeElement.ElementType) {
                 case ElementType.Bone:
-                    nodeElement.Index = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+                    nodeElement.Index = _reader.ReadVarLenIntAsInt32(BoneElementSize);
                     break;
                 case ElementType.Morph:
-                    nodeElement.Index = _reader.ReadVarLenSIntAsInt32(MorphElementSize);
+                    nodeElement.Index = _reader.ReadVarLenIntAsInt32(MorphElementSize);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -585,7 +587,7 @@ namespace AnotherWheel.Models {
             body.Name = ReadString() ?? string.Empty;
             body.NameEnglish = ReadString() ?? string.Empty;
 
-            body.BoneIndex = _reader.ReadVarLenSIntAsInt32(BoneElementSize);
+            body.BoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
             body.GroupIndex = _reader.ReadByte(); // TODO: Signed? Unsigned?
 
             var bits = _reader.ReadUInt16();
@@ -613,8 +615,8 @@ namespace AnotherWheel.Models {
             joint.NameEnglish = ReadString() ?? string.Empty;
 
             joint.Kind = (JointKind)_reader.ReadByte();
-            joint.BodyIndex1 = _reader.ReadVarLenSIntAsInt32(RigidBodyElementSize);
-            joint.BodyIndex2 = _reader.ReadVarLenSIntAsInt32(RigidBodyElementSize);
+            joint.BodyIndex1 = _reader.ReadVarLenIntAsInt32(RigidBodyElementSize);
+            joint.BodyIndex2 = _reader.ReadVarLenIntAsInt32(RigidBodyElementSize);
             joint.Position = _reader.ReadVector3();
             joint.Rotation = _reader.ReadVector3();
             joint.LimitMoveLower = _reader.ReadVector3();
@@ -630,8 +632,8 @@ namespace AnotherWheel.Models {
         private BodyAnchor ReadBodyAnchor() {
             var anchor = new BodyAnchor();
 
-            anchor.BodyIndex = _reader.ReadVarLenSIntAsInt32(RigidBodyElementSize);
-            anchor.VertexIndex = _reader.ReadVarLenSIntAsInt32(VertexElementSize);
+            anchor.BodyIndex = _reader.ReadVarLenIntAsInt32(RigidBodyElementSize);
+            anchor.VertexIndex = _reader.ReadVarLenIntAsInt32(VertexElementSize);
             anchor.IsNear = _reader.ReadBoolean();
 
             return anchor;
@@ -640,7 +642,7 @@ namespace AnotherWheel.Models {
         private VertexPin ReadVertexPin() {
             var pin = new VertexPin();
 
-            pin.VertexIndex = _reader.ReadVarLenSIntAsInt32(VertexElementSize);
+            pin.VertexIndex = _reader.ReadVarLenIntAsInt32(VertexElementSize);
 
             return pin;
         }
@@ -652,7 +654,7 @@ namespace AnotherWheel.Models {
             body.NameEnglish = ReadString() ?? string.Empty;
 
             body.Shape = (SoftBodyShape)_reader.ReadByte(); // TODO: Signed? Unsigned?
-            body.MaterialIndex = _reader.ReadVarLenSIntAsInt32(MaterialElementSize);
+            body.MaterialIndex = _reader.ReadVarLenIntAsInt32(MaterialElementSize);
             body.GroupIndex = _reader.ReadByte(); // TODO: Signed? Unsigned?
 
             var bits = _reader.ReadUInt16();

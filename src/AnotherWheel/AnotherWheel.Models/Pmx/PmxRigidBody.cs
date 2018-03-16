@@ -1,19 +1,9 @@
-﻿using JetBrains.Annotations;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
 namespace AnotherWheel.Models.Pmx {
-    public sealed class PmxRigidBody : IPmxNamedObject {
-
-        public string Name { get; internal set; }
-
-        public string NameEnglish { get; internal set; }
+    public sealed class PmxRigidBody : PmxBaseBody {
 
         public int BoneIndex { get; internal set; }
-
-        public int GroupIndex { get; internal set; }
-
-        [NotNull]
-        public PmxBodyPassGroup PassGroup { get; internal set; }
 
         public BoundingBoxKind BoundingBoxKind { get; internal set; }
 

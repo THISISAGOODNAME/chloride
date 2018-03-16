@@ -32,7 +32,7 @@ namespace AnotherWheel.Models.Pmx {
 
         public int AppendParentBoneIndex { get; internal set; } = InvalidBoneIndex;
 
-        public int ExtKey { get; internal set; }
+        public int ExternalParentIndex { get; internal set; }
 
         public float AppendRatio { get; internal set; } = 1;
 

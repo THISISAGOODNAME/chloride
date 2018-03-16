@@ -65,6 +65,7 @@
     <Compile Include="Pmx\NodeElement.cs" />
     <Compile Include="Pmx\MorphOffsetKind.cs" />
     <Compile Include="Pmx\MorphOp.cs" />
+    <Compile Include="Pmx\PmxBaseBody.cs" />
     <Compile Include="Pmx\PmxBodyPassGroup.cs" />
     <Compile Include="Pmx\PmxBone.cs" />
     <Compile Include="Pmx\PmxBoneMorph.cs" />

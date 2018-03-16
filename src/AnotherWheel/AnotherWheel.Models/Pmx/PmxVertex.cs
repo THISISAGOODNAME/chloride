@@ -4,9 +4,15 @@ using Microsoft.Xna.Framework;
 namespace AnotherWheel.Models.Pmx {
     public sealed class PmxVertex {
 
-        public const int MaxUvaCount = 4;
+        internal PmxVertex() {
+            var boneWeights = new BoneWeight[MaxBoneWeightCount];
 
-        public const int MaxBoneWeightCount = 4;
+            for (var i = 0; i < boneWeights.Length; ++i) {
+                boneWeights[i] = new BoneWeight();
+            }
+
+            BoneWeights = boneWeights;
+        }
 
         public Vector3 Position { get; internal set; }
 
@@ -23,7 +29,7 @@ namespace AnotherWheel.Models.Pmx {
         public Deformation Deformation { get; internal set; }
 
         [NotNull, ItemNotNull]
-        public BoneWeight[] BoneWeights { get; } = new BoneWeight[MaxBoneWeightCount];
+        public BoneWeight[] BoneWeights { get; }
 
         public float EdgeScale { get; internal set; }
 
@@ -36,6 +42,10 @@ namespace AnotherWheel.Models.Pmx {
         public Vector3 RW0 { get; internal set; }
 
         public Vector3 RW1 { get; internal set; }
+
+        public const int MaxUvaCount = 4;
+
+        public const int MaxBoneWeightCount = 4;
 
     }
 }

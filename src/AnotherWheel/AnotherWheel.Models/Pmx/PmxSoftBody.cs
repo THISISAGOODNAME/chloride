@@ -2,20 +2,9 @@
 using JetBrains.Annotations;
 
 namespace AnotherWheel.Models.Pmx {
-    public sealed class PmxSoftBody : IPmxNamedObject {
-
-        public string Name { get; internal set; }
-
-        public string NameEnglish { get; internal set; }
+    public sealed class PmxSoftBody : PmxBaseBody {
 
         public SoftBodyShape Shape { get; internal set; }
-
-        public int MaterialIndex { get; internal set; }
-
-        public int GroupIndex { get; internal set; }
-
-        [NotNull]
-        public PmxBodyPassGroup PassGroup { get; internal set; }
 
         public SoftBodyFlags Flags { get; internal set; }
 

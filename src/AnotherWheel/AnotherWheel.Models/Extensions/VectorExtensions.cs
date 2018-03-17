@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace AnotherWheel.Viewer.Extensions {
+namespace AnotherWheel.Models.Extensions {
     public static class VectorExtensions {
 
         public static Vector3 XYZ(this Vector4 vector) {

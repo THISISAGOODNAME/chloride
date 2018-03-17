@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
 namespace AnotherWheel.Models.Extensions {
-    internal static class ArrayExtensions {
+    public static class ArrayExtensions {
 
         [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
         [SuppressMessage("ReSharper", "HeuristicUnreachableCode")]
-        internal static bool ElementEquals<T>([NotNull, ItemCanBeNull] this T[] array, [NotNull, ItemCanBeNull] T[] other) {
+        public static bool ElementEquals<T>([NotNull, ItemCanBeNull] this T[] array, [NotNull, ItemCanBeNull] T[] other) {
             if (ReferenceEquals(array, other)) {
                 return true;
             }
@@ -38,6 +40,11 @@ namespace AnotherWheel.Models.Extensions {
             }
 
             return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasItem<T>([NotNull, ItemCanBeNull] this T[] array, [CanBeNull] T item) {
+            return Array.IndexOf(array, item) >= 0;
         }
 
     }

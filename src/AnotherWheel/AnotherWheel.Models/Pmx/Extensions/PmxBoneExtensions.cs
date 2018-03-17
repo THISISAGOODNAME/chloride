@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using AnotherWheel.Models.Extensions;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace AnotherWheel.Models.Pmx.Extensions {
@@ -8,12 +9,21 @@ namespace AnotherWheel.Models.Pmx.Extensions {
             return (bone.Flags & flag) != 0;
         }
 
+        public static void SetAnimationValue([NotNull] this PmxBone bone, Vector3 position, Quaternion rotation) {
+            bone.RelativePosition = position;
+
+            var rotMatrix = Matrix.CreateFromQuaternion(rotation);
+
+            bone.LocalX = rotMatrix.Row1().XYZ();
+            bone.LocalY = rotMatrix.Row2().XYZ();
+            bone.LocalZ = rotMatrix.Row3().XYZ();
+        }
+
         internal static void CalculateHierarchy([NotNull] this PmxBone bone) {
             if (bone.HierarchyCalculated) {
                 return;
             }
 
-            // TODO: Right-handed or left-handed?
             var localMatrix = new Matrix(
                 bone.LocalX.X, bone.LocalX.Y, bone.LocalX.Z, 0,
                 bone.LocalY.X, bone.LocalY.Y, bone.LocalY.Z, 0,

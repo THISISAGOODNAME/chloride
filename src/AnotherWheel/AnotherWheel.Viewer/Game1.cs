@@ -43,9 +43,12 @@ namespace AnotherWheel.Viewer {
 
             Components.Add(ksh);
             Components.Add(new MouseCameraControl(this));
+            Components.Add(new FpsCounter(this));
+
+            _pmxVmdAnimator = new PmxVmdAnimator(this);
+            Components.Add(_pmxVmdAnimator);
 
             _pmxRenderer = new PmxRenderer(this);
-
             Components.Add(_pmxRenderer);
 
             IsMouseVisible = true;
@@ -105,6 +108,8 @@ namespace AnotherWheel.Viewer {
             using (var fileStream = File.Open(Path.Combine(modelBaseDir, "LD.vmd"), FileMode.Open, FileAccess.Read, FileShare.Read)) {
                 vmdMotion = VmdReader.ReadMotion(fileStream);
             }
+
+            _pmxVmdAnimator.InitializeContents(pmxModel, vmdMotion);
 
             _vmdMotion = vmdMotion;
 
@@ -201,6 +206,7 @@ namespace AnotherWheel.Viewer {
         private PmxModel _pmxModel;
         private PmxRenderer _pmxRenderer;
         private VmdMotion _vmdMotion;
+        private PmxVmdAnimator _pmxVmdAnimator;
 
         private readonly Dictionary<string, Texture2D> _modelTextures = new Dictionary<string, Texture2D>();
 

@@ -24,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
@@ -34,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -43,6 +45,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Components\Camera.cs" />
+    <Compile Include="Components\FpsCounter.cs" />
     <Compile Include="Components\KeyboardStateHandler.cs" />
     <Compile Include="Components\KeyEventArgs.cs" />
     <Compile Include="Components\MouseCameraControl.cs" />
@@ -51,10 +54,9 @@
     <Compile Include="ContentHelper.cs" />
     <Compile Include="DisposableBase.cs" />
     <Compile Include="Extensions\GameExtensions.cs" />
-    <Compile Include="Extensions\VectorExtensions.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Internal\MeshPart.cs" />
     <Compile Include="MathF.cs" />
-    <Compile Include="ModelWrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -449,7 +449,7 @@ namespace AnotherWheel.Models {
 
             morph.Index = _reader.ReadVarLenIntAsInt32(BoneElementSize);
             morph.Translation = _reader.ReadVector3();
-            morph.Rotation = _reader.ReadVector4();
+            morph.Rotation = new Quaternion(_reader.ReadVector4());
 
             return morph;
         }
@@ -597,7 +597,7 @@ namespace AnotherWheel.Models {
             body.BoundingBoxKind = (BoundingBoxKind)_reader.ReadByte();
             body.BoundingBoxSize = _reader.ReadVector3();
             body.Position = _reader.ReadVector3();
-            body.Rotation = _reader.ReadVector3();
+            body.RotationAngles = _reader.ReadVector3();
             body.Mass = _reader.ReadSingle();
             body.PositionDamping = _reader.ReadSingle();
             body.RotationDamping = _reader.ReadSingle();
@@ -618,7 +618,7 @@ namespace AnotherWheel.Models {
             joint.BodyIndex1 = _reader.ReadVarLenIntAsInt32(RigidBodyElementSize);
             joint.BodyIndex2 = _reader.ReadVarLenIntAsInt32(RigidBodyElementSize);
             joint.Position = _reader.ReadVector3();
-            joint.Rotation = _reader.ReadVector3();
+            joint.RotationAngles = _reader.ReadVector3();
             joint.LimitMoveLower = _reader.ReadVector3();
             joint.LimitMoveUpper = _reader.ReadVector3();
             joint.LimitAngleLower = _reader.ReadVector3();

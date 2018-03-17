@@ -46,7 +46,7 @@ namespace AnotherWheel.Models.Pmx {
         [NotNull, ItemNotNull]
         public IReadOnlyList<PmxJoint> Joints { get; internal set; }
 
-        [NotNull, ItemNotNull]
+        [CanBeNull, ItemNotNull]
         public IReadOnlyList<PmxSoftBody> SoftBodies { get; internal set; }
 
     }

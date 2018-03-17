@@ -226,7 +226,7 @@ namespace AnotherWheel.Viewer.Components {
         private Vector3 _forward = Vector3.UnitY;
         private Vector3 _right = Vector3.UnitX;
 
-        private float _fieldOfView = MathHelper.PiOver2;
+        private float _fieldOfView = MathHelper.ToRadians(60);
 
         private float _nearClip = 0.5f;
         private float _farClip = 120f;

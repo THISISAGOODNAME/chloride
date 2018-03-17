@@ -46,6 +46,7 @@
     <Compile Include="Components\KeyboardStateHandler.cs" />
     <Compile Include="Components\KeyEventArgs.cs" />
     <Compile Include="Components\MouseCameraControl.cs" />
+    <Compile Include="Components\PmxVmdAnimator.cs" />
     <Compile Include="Components\PmxRenderer.cs" />
     <Compile Include="ContentHelper.cs" />
     <Compile Include="DisposableBase.cs" />

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using AnotherWheel.Models;
 using AnotherWheel.Models.Pmx;
+using AnotherWheel.Models.Vmd;
 using AnotherWheel.Viewer.Components;
 using AnotherWheel.Viewer.Extensions;
 using Microsoft.Xna.Framework;
@@ -99,6 +100,14 @@ namespace AnotherWheel.Viewer {
 
             _pmxRenderer.InitializeContents(pmxModel, camera, _modelTextures);
 
+            VmdMotion vmdMotion;
+
+            using (var fileStream = File.Open(Path.Combine(modelBaseDir, "LD.vmd"), FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                vmdMotion = VmdReader.ReadMotion(fileStream);
+            }
+
+            _vmdMotion = vmdMotion;
+
             void TryLoadTexture(string relativeFilePath) {
                 if (_modelTextures.ContainsKey(relativeFilePath)) {
                     return;
@@ -191,6 +200,7 @@ namespace AnotherWheel.Viewer {
 
         private PmxModel _pmxModel;
         private PmxRenderer _pmxRenderer;
+        private VmdMotion _vmdMotion;
 
         private readonly Dictionary<string, Texture2D> _modelTextures = new Dictionary<string, Texture2D>();
 

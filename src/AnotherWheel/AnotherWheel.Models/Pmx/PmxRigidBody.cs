@@ -11,7 +11,7 @@ namespace AnotherWheel.Models.Pmx {
 
         public Vector3 Position { get; internal set; }
 
-        public Vector3 Rotation { get; internal set; }
+        public Vector3 RotationAngles { get; internal set; }
 
         public float Mass { get; internal set; }
 

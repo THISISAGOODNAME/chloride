@@ -91,6 +91,15 @@
     <Compile Include="Pmx\SphereMode.cs" />
     <Compile Include="Pmx\VertexPin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VmdReader.cs" />
+    <Compile Include="Vmd\IKControl.cs" />
+    <Compile Include="Vmd\VmdBaseFrame.cs" />
+    <Compile Include="Vmd\VmdBoneFrame.cs" />
+    <Compile Include="Vmd\VmdCameraFrame.cs" />
+    <Compile Include="Vmd\VmdFacialFrame.cs" />
+    <Compile Include="Vmd\VmdIKFrame.cs" />
+    <Compile Include="Vmd\VmdLightFrame.cs" />
+    <Compile Include="Vmd\VmdMotion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

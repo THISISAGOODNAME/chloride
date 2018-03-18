@@ -59,7 +59,7 @@ namespace AnotherWheel.Viewer.Components {
 
             var effect = new BasicEffect(GraphicsDevice);
 
-            effect.DiffuseColor = Color.White.ToVector3();
+            effect.DiffuseColor = Color.Red.ToVector3();
             effect.Alpha = 1.0f;
 
             _effect = effect;

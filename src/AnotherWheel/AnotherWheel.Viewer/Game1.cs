@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using AnotherWheel.Models;
 using AnotherWheel.Models.Pmx;
 using AnotherWheel.Models.Vmd;
+using AnotherWheel.Models.Vmd.Extensions;
 using AnotherWheel.Viewer.Components;
 using AnotherWheel.Viewer.Extensions;
 using Microsoft.Xna.Framework;
@@ -112,6 +115,10 @@ namespace AnotherWheel.Viewer {
                 vmdMotion = VmdReader.ReadMotion(fileStream);
             }
 
+            var vmdMotionScaleFactor = TryDetectVmdScaleFactor();
+
+            vmdMotion.Scale(vmdMotionScaleFactor);
+
             _pmxVmdAnimator.InitializeContents(pmxModel, vmdMotion);
 
             _vmdMotion = vmdMotion;
@@ -128,6 +135,51 @@ namespace AnotherWheel.Viewer {
                 if (texture != null) {
                     _modelTextures[relativeFilePath] = texture;
                 }
+            }
+
+            float TryDetectVmdScaleFactor() {
+                const float defaultScaleFactor = 1.0f;
+
+                PmxBone pmxBone1, pmxBone2;
+
+                try {
+                    pmxBone1 = pmxModel.Bones.SingleOrDefault(b => string.Equals(b.Name, "全ての親", StringComparison.Ordinal));
+                    pmxBone2 = pmxModel.Bones.SingleOrDefault(b => string.Equals(b.Name, "センター", StringComparison.Ordinal));
+                } catch (InvalidOperationException ex) {
+                    // Multiple bones in PMX model having the same name.
+                    Debug.Print(ex.ToString());
+
+                    return defaultScaleFactor;
+                }
+
+                var vmdBone1 = vmdMotion.BoneFrames.FirstOrDefault(b => string.Equals(b.Name, "全ての親", StringComparison.Ordinal));
+                var vmdBone2 = vmdMotion.BoneFrames.FirstOrDefault(b => string.Equals(b.Name, "センター", StringComparison.Ordinal));
+
+                if (pmxBone1 == null || pmxBone2 == null || vmdBone1 == null || vmdBone2 == null) {
+                    Debug.Print("At least one of the standard bones is not found. Returning default scale.");
+
+                    return defaultScaleFactor;
+                }
+
+                if (vmdBone1.FrameIndex != 0 || vmdBone2.FrameIndex != 0) {
+                    Debug.Print("The two VMD standard bones should have appeared at the first frame (index=0). Returning default scale.");
+
+                    return defaultScaleFactor;
+                }
+
+                if (pmxBone2.ReferenceParent != pmxBone1) {
+                    Debug.Print("PMX bone #2's parent should be PMX bone #1.");
+
+                    return defaultScaleFactor;
+                }
+
+                var pmxRelativePosition = pmxBone2.RelativePosition;
+                var vmdRelativePosition = vmdBone2.Position - vmdBone1.Position;
+
+                var pmxLength = pmxRelativePosition.Length();
+                var vmdLength = vmdRelativePosition.Length();
+
+                return pmxLength / vmdLength;
             }
         }
 

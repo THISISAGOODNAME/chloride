@@ -36,6 +36,7 @@ namespace AnotherWheel.Models.Pmx.Extensions {
 
             if (bone.ReferenceParent != null) {
                 bone.ReferenceParent.CalculateHierarchy();
+
                 bone.RelativePosition = bone.Position - bone.ReferenceParent.Position;
                 worldMatrix = localMatrix * bone.ReferenceParent.WorldMatrix;
             } else {

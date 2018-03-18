@@ -51,6 +51,9 @@ namespace AnotherWheel.Viewer {
             _pmxRenderer = new PmxRenderer(this);
             Components.Add(_pmxRenderer);
 
+            _boneDebugVisualizer = new BoneDebugVisualizer(this);
+            Components.Add(_boneDebugVisualizer);
+
             IsMouseVisible = true;
 
             base.Initialize();
@@ -112,6 +115,8 @@ namespace AnotherWheel.Viewer {
             _pmxVmdAnimator.InitializeContents(pmxModel, vmdMotion);
 
             _vmdMotion = vmdMotion;
+
+            _boneDebugVisualizer.InitializeContents(pmxModel, camera);
 
             void TryLoadTexture(string relativeFilePath) {
                 if (_modelTextures.ContainsKey(relativeFilePath)) {
@@ -207,6 +212,7 @@ namespace AnotherWheel.Viewer {
         private PmxRenderer _pmxRenderer;
         private VmdMotion _vmdMotion;
         private PmxVmdAnimator _pmxVmdAnimator;
+        private BoneDebugVisualizer _boneDebugVisualizer;
 
         private readonly Dictionary<string, Texture2D> _modelTextures = new Dictionary<string, Texture2D>();
 

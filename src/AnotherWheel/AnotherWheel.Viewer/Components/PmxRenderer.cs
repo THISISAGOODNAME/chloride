@@ -93,7 +93,7 @@ namespace AnotherWheel.Viewer.Components {
             var camera = _camera;
             var graphicsDevice = GraphicsDevice;
 
-            graphicsDevice.BlendState = BlendState.AlphaBlend;
+            graphicsDevice.BlendState = BlendState.NonPremultiplied;
             graphicsDevice.RasterizerState = RasterizerState.CullNone;
             graphicsDevice.DepthStencilState = DepthStencilState.Default;
 

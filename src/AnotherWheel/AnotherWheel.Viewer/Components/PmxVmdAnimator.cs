@@ -48,9 +48,9 @@ namespace AnotherWheel.Viewer.Components {
 
             Trace.Assert(renderer != null);
 
-            UpdateVerticesCallback(renderer.Vertices);
+            //UpdateVerticesCallback(renderer.Vertices);
 
-            ++_frameCounter;
+            //++_frameCounter;
         }
 
         private void UpdateVerticesCallback([NotNull] VertexPositionNormalTexture[] vertices) {
@@ -89,6 +89,7 @@ namespace AnotherWheel.Viewer.Components {
                 }
 
                 var boneFrame = _currentBoneFrames[pmxBone.Name];
+                //var boneFrame = _lastBoneFrames[pmxBone.Name];
                 pmxBone.SetAnimationValue(boneFrame.Position, boneFrame.Rotation);
             }
 
@@ -134,6 +135,7 @@ namespace AnotherWheel.Viewer.Components {
                         }
 
                         var finalPos = Vector3.Transform(pmxVertex.Position, transform);
+                        finalPos = pmxVertex.Position;
 
                         // TODO: Transform normals plz.
                         var pv = pVertices + i;

@@ -8,19 +8,20 @@ namespace AnotherWheel.Models.Pmx.Extensions {
             return (bone.Flags & flag) != 0;
         }
 
-        public static void SetLocalRotationAxes([NotNull] this PmxBone bone, Vector3 localX, Vector3 localY, Vector3 localZ) {
+        public static void SetAnimationValue([NotNull] this PmxBone bone, Vector3 vmdPosition, Quaternion rotation) {
+            bone.Position = bone.InitialPosition + vmdPosition;
+            bone.Rotation = rotation;
+        }
+
+        internal static void SetLocalRotationAxes([NotNull] this PmxBone bone, Vector3 localX, Vector3 localY, Vector3 localZ) {
             var rotationMatrix = new Matrix(
                 localX.X, localX.Y, localX.Z, 0,
                 localY.X, localY.Y, localY.Z, 0,
                 localZ.X, localZ.Y, localZ.Z, 0,
                 0, 0, 0, 1);
 
-            bone.Rotation = Quaternion.CreateFromRotationMatrix(rotationMatrix);
-        }
-
-        public static void SetAnimationValue([NotNull] this PmxBone bone, Vector3 position, Quaternion rotation) {
-            bone.Position = position;
-            bone.Rotation = rotation;
+            bone.InitialRotation = Quaternion.CreateFromRotationMatrix(rotationMatrix);
+            bone.Rotation = bone.InitialRotation;
         }
 
         internal static void CalculateHierarchy([NotNull] this PmxBone bone) {
@@ -28,38 +29,33 @@ namespace AnotherWheel.Models.Pmx.Extensions {
                 return;
             }
 
-            var localMatrix = Matrix.CreateFromQuaternion(bone.Rotation);
+            var parent = bone.ReferenceParent;
 
-            Matrix worldMatrix;
-
-            var pos = bone.Position;
-
-            if (bone.ReferenceParent != null) {
-                bone.ReferenceParent.CalculateHierarchy();
-
-                bone.RelativePosition = pos - bone.ReferenceParent.Position;
-                worldMatrix = localMatrix * bone.ReferenceParent.WorldMatrix;
+            if (parent == null) {
+                // A root bone
+                bone.RelativePosition = bone.Position;
+                bone.LocalMatrix = CalculateTransform(bone.RelativePosition, bone.Rotation);
+                bone.WorldMatrix = bone.LocalMatrix;
             } else {
-                // Already on top
-                bone.RelativePosition = pos;
-                worldMatrix = localMatrix;
-            }
+                // A bone with parent
+                parent.CalculateHierarchy();
 
-            worldMatrix.M41 = pos.X;
-            worldMatrix.M42 = pos.Y;
-            worldMatrix.M43 = pos.Z;
-            worldMatrix.M44 = 1;
-
-            bone.WorldMatrix = worldMatrix;
-
-            if (bone.ReferenceParent != null) {
-                var invWorld = Matrix.Invert(bone.ReferenceParent.WorldMatrix);
-                bone.LocalMatrix = worldMatrix * invWorld;
-            } else {
-                bone.LocalMatrix = worldMatrix;
+                bone.RelativePosition = bone.Position - parent.Position;
+                bone.LocalMatrix = CalculateTransform(bone.RelativePosition, bone.Rotation);
+                bone.WorldMatrix = parent.WorldMatrix * bone.LocalMatrix;
             }
 
             bone.HierarchyCalculated = true;
+        }
+
+        private static Matrix CalculateTransform(Vector3 translation, Quaternion rotation) {
+            var transformMatrix = Matrix.CreateFromQuaternion(rotation);
+            transformMatrix.M41 = translation.X;
+            transformMatrix.M42 = translation.Y;
+            transformMatrix.M43 = translation.Z;
+            transformMatrix.M44 = 1;
+
+            return transformMatrix;
         }
 
     }

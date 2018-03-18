@@ -10,6 +10,8 @@ namespace AnotherWheel.Models.Pmx {
         // ReSharper disable once NotNullMemberIsNotInitialized
         public string NameEnglish { get; internal set; }
 
+        public Vector3 InitialPosition { get; internal set; }
+
         public Vector3 Position { get; internal set; }
 
         public Vector3 RelativePosition { get; internal set; }
@@ -21,6 +23,8 @@ namespace AnotherWheel.Models.Pmx {
         //public Vector3 LocalY { get; internal set; } = Vector3.UnitY;
 
         //public Vector3 LocalZ { get; internal set; } = Vector3.UnitZ;
+
+        public Quaternion InitialRotation { get; internal set; }
 
         public Quaternion Rotation { get; internal set; }
 

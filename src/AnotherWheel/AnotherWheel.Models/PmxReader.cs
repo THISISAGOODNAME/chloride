@@ -376,7 +376,8 @@ namespace AnotherWheel.Models {
 
             bone.Name = ReadString() ?? string.Empty;
             bone.NameEnglish = ReadString() ?? string.Empty;
-            bone.Position = _reader.ReadVector3();
+            bone.InitialPosition = _reader.ReadVector3();
+            bone.Position = bone.InitialPosition;
             bone.ParentBoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
             bone.Level = _reader.ReadInt32();
             bone.Flags = (BoneFlags)_reader.ReadUInt16();

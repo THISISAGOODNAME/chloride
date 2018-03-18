@@ -121,6 +121,8 @@ namespace AnotherWheel.Viewer {
 
             _pmxVmdAnimator.InitializeContents(pmxModel, vmdMotion);
 
+            //_pmxVmdAnimator.Enabled = false;
+
             _vmdMotion = vmdMotion;
 
             _boneDebugVisualizer.InitializeContents(pmxModel, camera);
@@ -168,7 +170,7 @@ namespace AnotherWheel.Viewer {
                 }
 
                 if (pmxBone2.ReferenceParent != pmxBone1) {
-                    Debug.Print("PMX bone #2's parent should be PMX bone #1.");
+                    Debug.Print("The parent of PMX bone #2 (\"センター\") should be PMX bone #1 (\"全ての親\").");
 
                     return defaultScaleFactor;
                 }

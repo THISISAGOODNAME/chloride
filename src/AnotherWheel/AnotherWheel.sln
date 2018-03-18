@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnotherWheel.Models", "AnotherWheel.Models\AnotherWheel.Models.csproj", "{9BFF6605-D890-4BBD-A02D-818315DC262B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnotherWheel.Viewer", "AnotherWheel.Viewer\AnotherWheel.Viewer.csproj", "{9E5EEF29-0610-4E2D-BA09-3F0B1CF6BA05}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnotherWheel.Viewer", "AnotherWheel.Viewer\AnotherWheel.Viewer.csproj", "{5841DD20-1B87-4C19-9C0C-E1F1831E3D27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{9BFF6605-D890-4BBD-A02D-818315DC262B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BFF6605-D890-4BBD-A02D-818315DC262B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BFF6605-D890-4BBD-A02D-818315DC262B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9E5EEF29-0610-4E2D-BA09-3F0B1CF6BA05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E5EEF29-0610-4E2D-BA09-3F0B1CF6BA05}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9E5EEF29-0610-4E2D-BA09-3F0B1CF6BA05}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9E5EEF29-0610-4E2D-BA09-3F0B1CF6BA05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5841DD20-1B87-4C19-9C0C-E1F1831E3D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5841DD20-1B87-4C19-9C0C-E1F1831E3D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5841DD20-1B87-4C19-9C0C-E1F1831E3D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5841DD20-1B87-4C19-9C0C-E1F1831E3D27}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

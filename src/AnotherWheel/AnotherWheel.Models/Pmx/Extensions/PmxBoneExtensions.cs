@@ -1,5 +1,4 @@
-﻿using AnotherWheel.Models.Extensions;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace AnotherWheel.Models.Pmx.Extensions {
@@ -9,14 +8,19 @@ namespace AnotherWheel.Models.Pmx.Extensions {
             return (bone.Flags & flag) != 0;
         }
 
+        public static void SetLocalRotationAxes([NotNull] this PmxBone bone, Vector3 localX, Vector3 localY, Vector3 localZ) {
+            var rotationMatrix = new Matrix(
+                localX.X, localX.Y, localX.Z, 0,
+                localY.X, localY.Y, localY.Z, 0,
+                localZ.X, localZ.Y, localZ.Z, 0,
+                0, 0, 0, 1);
+
+            bone.Rotation = Quaternion.CreateFromRotationMatrix(rotationMatrix);
+        }
+
         public static void SetAnimationValue([NotNull] this PmxBone bone, Vector3 position, Quaternion rotation) {
             bone.RelativePosition = position;
-
-            var rotMatrix = Matrix.CreateFromQuaternion(rotation);
-
-            bone.LocalX = rotMatrix.Row1().XYZ();
-            bone.LocalY = rotMatrix.Row2().XYZ();
-            bone.LocalZ = rotMatrix.Row3().XYZ();
+            bone.Rotation = rotation;
         }
 
         internal static void CalculateHierarchy([NotNull] this PmxBone bone) {
@@ -24,11 +28,7 @@ namespace AnotherWheel.Models.Pmx.Extensions {
                 return;
             }
 
-            var localMatrix = new Matrix(
-                bone.LocalX.X, bone.LocalX.Y, bone.LocalX.Z, 0,
-                bone.LocalY.X, bone.LocalY.Y, bone.LocalY.Z, 0,
-                bone.LocalZ.X, bone.LocalZ.Y, bone.LocalZ.Z, 0,
-                0, 0, 0, 1);
+            var localMatrix = Matrix.CreateFromQuaternion(bone.Rotation);
 
             bone.LocalMatrix = localMatrix;
 

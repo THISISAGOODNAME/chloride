@@ -409,9 +409,7 @@ namespace AnotherWheel.Models {
                 localY.Normalize();
                 localZ.Normalize();
 
-                bone.LocalX = localX;
-                bone.LocalY = localY;
-                bone.LocalZ = localZ;
+                bone.SetLocalRotationAxes(localX, localY, localZ);
             }
 
             if (bone.HasFlag(BoneFlags.ExtParent)) {

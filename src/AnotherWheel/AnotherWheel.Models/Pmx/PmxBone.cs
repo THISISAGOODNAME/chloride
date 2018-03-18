@@ -16,11 +16,13 @@ namespace AnotherWheel.Models.Pmx {
 
         public Vector3 Axis { get; internal set; }
 
-        public Vector3 LocalX { get; internal set; } = Vector3.UnitX;
+        //public Vector3 LocalX { get; internal set; } = Vector3.UnitX;
 
-        public Vector3 LocalY { get; internal set; } = Vector3.UnitY;
+        //public Vector3 LocalY { get; internal set; } = Vector3.UnitY;
 
-        public Vector3 LocalZ { get; internal set; } = Vector3.UnitZ;
+        //public Vector3 LocalZ { get; internal set; } = Vector3.UnitZ;
+
+        public Quaternion Rotation { get; internal set; }
 
         public int ParentBoneIndex { get; internal set; } = InvalidBoneIndex;
 

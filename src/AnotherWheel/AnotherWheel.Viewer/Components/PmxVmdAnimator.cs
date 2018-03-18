@@ -53,41 +53,42 @@ namespace AnotherWheel.Viewer.Components {
             ++_frameCounter;
         }
 
-        private unsafe void UpdateVerticesCallback([NotNull] VertexPositionNormalTexture[] vertices) {
+        private void UpdateVerticesCallback([NotNull] VertexPositionNormalTexture[] vertices) {
             var pmxModel = _pmxModel;
             var frameCounter = _frameCounter;
-
-            var currentBoneFrameValues = new Dictionary<string, VmdBoneFrame>(_boneFrameNames.Length);
 
             // Calculate all current bone frame values by linear interpolation.
             foreach (var name in _boneFrameNames) {
                 var lastBoneFrame = _lastBoneFrames[name];
                 var nextBoneFrame = _boneFrameCache[name].Find(frame => frame.FrameIndex > lastBoneFrame.FrameIndex);
 
-                if (nextBoneFrame != null && nextBoneFrame.FrameIndex == frameCounter) {
+                if (nextBoneFrame != null && (int)(nextBoneFrame.FrameIndex * FrameRateRatio) == frameCounter) {
                     lastBoneFrame = nextBoneFrame;
                     nextBoneFrame = _boneFrameCache[name].Find(frame => frame.FrameIndex > lastBoneFrame.FrameIndex);
                     _lastBoneFrames[name] = lastBoneFrame;
                 }
 
+                var extendedLastBoneFrameIndex = (int)(lastBoneFrame.FrameIndex * FrameRateRatio);
+
                 if (nextBoneFrame == null) {
                     // The animation has stopped.
-                    currentBoneFrameValues[name] = lastBoneFrame;
+                    _currentBoneFrames[name] = lastBoneFrame.CopyWithDifferentFrameIndex((int)(lastBoneFrame.FrameIndex * FrameRateRatio));
                 } else {
-                    var t = (float)(frameCounter - lastBoneFrame.FrameIndex) / (nextBoneFrame.FrameIndex - lastBoneFrame.FrameIndex);
-                    var interpFrame = lastBoneFrame.Lerp(nextBoneFrame, t);
+                    var extendedNextBoneFrameIndex = (int)(nextBoneFrame.FrameIndex * FrameRateRatio);
+                    var t = (float)(frameCounter - extendedLastBoneFrameIndex) / (extendedNextBoneFrameIndex - extendedLastBoneFrameIndex);
+                    var interpFrame = lastBoneFrame.Lerp(nextBoneFrame, t, FrameRateRatio);
 
-                    currentBoneFrameValues[name] = interpFrame;
+                    _currentBoneFrames[name] = interpFrame;
                 }
             }
 
             // Calculate, set bone animation position/rotation, ...
             foreach (var pmxBone in pmxModel.Bones) {
-                if (!currentBoneFrameValues.ContainsKey(pmxBone.Name)) {
+                if (!_currentBoneFrames.ContainsKey(pmxBone.Name)) {
                     continue;
                 }
 
-                var boneFrame = currentBoneFrameValues[pmxBone.Name];
+                var boneFrame = _currentBoneFrames[pmxBone.Name];
                 pmxBone.SetAnimationValue(boneFrame.Position, boneFrame.Rotation);
             }
 
@@ -97,49 +98,55 @@ namespace AnotherWheel.Viewer.Components {
             // Now apply the bone transforms to our vertices.
             var vertexCount = pmxModel.Vertices.Count;
 
-            fixed (VertexPositionNormalTexture* pVertices = vertices) {
-                for (var i = 0; i < vertexCount; ++i) {
-                    var pmxVertex = pmxModel.Vertices[i];
-                    var boneWeights = pmxVertex.BoneWeights;
+            unsafe {
+                fixed (VertexPositionNormalTexture* pVertices = vertices) {
+                    for (var i = 0; i < vertexCount; ++i) {
+                        var pmxVertex = pmxModel.Vertices[i];
+                        var boneWeights = pmxVertex.BoneWeights;
 
-                    var validBoneCount = 0;
+                        var validBoneCount = 0;
 
-                    for (var j = 0; j < PmxVertex.MaxBoneWeightCount; ++j) {
-                        if (boneWeights[j].IsValid) {
-                            ++validBoneCount;
-                        } else {
-                            break;
+                        for (var j = 0; j < PmxVertex.MaxBoneWeightCount; ++j) {
+                            if (boneWeights[j].IsValid) {
+                                ++validBoneCount;
+                            } else {
+                                break;
+                            }
                         }
+
+                        if (validBoneCount == 0) {
+                            continue;
+                        }
+
+                        float weightTotal = 0;
+
+                        for (var j = 0; j < validBoneCount; ++j) {
+                            weightTotal += boneWeights[j].Weight;
+                        }
+
+                        var transform = EmptyMatrix;
+
+                        for (var j = 0; j < validBoneCount; ++j) {
+                            var pmxBone = pmxModel.Bones[boneWeights[j].BoneIndex];
+                            var w = boneWeights[j].Weight / weightTotal;
+
+                            transform += pmxBone.WorldMatrix * w;
+                        }
+
+                        var finalPos = Vector3.Transform(pmxVertex.Position, transform);
+
+                        // TODO: Transform normals plz.
+                        var pv = pVertices + i;
+
+                        pv->Position = finalPos;
                     }
-
-                    if (validBoneCount == 0) {
-                        continue;
-                    }
-
-                    float weightTotal = 0;
-
-                    for (var j = 0; j < validBoneCount; ++j) {
-                        weightTotal += boneWeights[j].Weight;
-                    }
-
-                    var transform = new Matrix();
-
-                    for (var j = 0; j < validBoneCount; ++j) {
-                        var pmxBone = pmxModel.Bones[boneWeights[j].BoneIndex];
-                        var w = boneWeights[j].Weight / weightTotal;
-
-                        transform += pmxBone.WorldMatrix * w;
-                    }
-
-                    var finalPos = Vector3.Transform(pmxVertex.Position, transform);
-
-                    // TODO: Transform normals plz.
-                    var pv = pVertices + i;
-
-                    pv->Position = finalPos;
                 }
             }
         }
+
+        private static readonly float FrameRateRatio = 60f / 60f;
+
+        private static readonly Matrix EmptyMatrix = new Matrix(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
         private PmxModel _pmxModel;
         private VmdMotion _vmdMotion;
@@ -147,6 +154,7 @@ namespace AnotherWheel.Viewer.Components {
         private string[] _boneFrameNames;
         private readonly Dictionary<string, List<VmdBoneFrame>> _boneFrameCache = new Dictionary<string, List<VmdBoneFrame>>();
         private readonly Dictionary<string, VmdBoneFrame> _lastBoneFrames = new Dictionary<string, VmdBoneFrame>();
+        private readonly Dictionary<string, VmdBoneFrame> _currentBoneFrames = new Dictionary<string, VmdBoneFrame>();
 
         private int _frameCounter;
 

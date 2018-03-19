@@ -229,7 +229,7 @@ namespace AnotherWheel.Viewer.Components {
         private float _fieldOfView = MathHelper.ToRadians(60);
 
         private float _nearClip = 0.5f;
-        private float _farClip = 120f;
+        private float _farClip = 1000f;
 
         private float _pitch;
         private float _yaw;

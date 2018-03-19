@@ -142,6 +142,7 @@ namespace AnotherWheel.Models {
 
                 for (var i = 0; i < boneCount; ++i) {
                     bones[i] = ReadPmxBone();
+                    bones[i].BoneIndex = i;
                 }
 
                 model.Bones = bones;
@@ -154,14 +155,14 @@ namespace AnotherWheel.Models {
                     if (bone.ParentBoneIndex < 0) {
                         rootBoneIndexList.Add(i);
                     } else {
-                        bone.ReferenceParent = bones[bone.ParentBoneIndex];
+                        bone.ParentBone = bones[bone.ParentBoneIndex];
                     }
                 }
 
                 model.RootBoneIndices = rootBoneIndexList.ToArray();
 
                 foreach (var bone in bones) {
-                    bone.CalculateHierarchy();
+                    bone.SetToVmdPose();
                 }
             }
 
@@ -377,7 +378,7 @@ namespace AnotherWheel.Models {
             bone.Name = ReadString() ?? string.Empty;
             bone.NameEnglish = ReadString() ?? string.Empty;
             bone.InitialPosition = _reader.ReadVector3();
-            bone.Position = bone.InitialPosition;
+            bone.CurrentPosition = bone.InitialPosition;
             bone.ParentBoneIndex = _reader.ReadVarLenIntAsInt32(BoneElementSize);
             bone.Level = _reader.ReadInt32();
             bone.Flags = (BoneFlags)_reader.ReadUInt16();
@@ -410,7 +411,9 @@ namespace AnotherWheel.Models {
                 localY.Normalize();
                 localZ.Normalize();
 
-                bone.SetLocalRotationAxes(localX, localY, localZ);
+                bone.SetInitialRotationFromRotationAxes(localX, localY, localZ);
+            } else {
+                bone.CurrentRotation = Quaternion.Identity;
             }
 
             if (bone.HasFlag(BoneFlags.ExtParent)) {

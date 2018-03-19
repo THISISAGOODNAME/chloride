@@ -4,29 +4,34 @@ using Microsoft.Xna.Framework;
 namespace AnotherWheel.Models.Pmx {
     public sealed class PmxBone : IPmxNamedObject {
 
+        internal PmxBone() {
+        }
+
+        public const int InvalidBoneIndex = -1;
+
         // ReSharper disable once NotNullMemberIsNotInitialized
         public string Name { get; internal set; }
 
         // ReSharper disable once NotNullMemberIsNotInitialized
         public string NameEnglish { get; internal set; }
 
-        public Vector3 InitialPosition { get; internal set; }
+        public Vector3 InitialPosition {
+            get => _initialPosition;
+            internal set {
+                _initialPosition = value;
+                BindPoseMatrixInverse = Matrix.CreateTranslation(-value);
+            }
+        }
 
-        public Vector3 Position { get; internal set; }
+        public int BoneIndex { get; internal set; }
 
-        public Vector3 RelativePosition { get; internal set; }
+        public Vector3 CurrentPosition { get; internal set; }
 
         public Vector3 Axis { get; internal set; }
 
-        //public Vector3 LocalX { get; internal set; } = Vector3.UnitX;
-
-        //public Vector3 LocalY { get; internal set; } = Vector3.UnitY;
-
-        //public Vector3 LocalZ { get; internal set; } = Vector3.UnitZ;
-
         public Quaternion InitialRotation { get; internal set; }
 
-        public Quaternion Rotation { get; internal set; }
+        public Quaternion CurrentRotation { get; internal set; }
 
         public int ParentBoneIndex { get; internal set; } = InvalidBoneIndex;
 
@@ -48,15 +53,23 @@ namespace AnotherWheel.Models.Pmx {
         public PmxIK IK { get; internal set; }
 
         [CanBeNull]
-        public PmxBone ReferenceParent { get; internal set; }
+        public PmxBone ParentBone { get; internal set; }
 
         public Matrix WorldMatrix { get; internal set; }
 
-        public Matrix LocalMatrix { get; internal set; }
+        public Matrix SkinMatrix { get; internal set; }
 
-        internal bool HierarchyCalculated { get; set; }
+        internal Matrix LocalMatrix { get; set; }
 
-        public const int InvalidBoneIndex = -1;
+        internal bool IsTransformCalculated { get; set; }
+
+        internal Matrix BindPoseMatrixInverse { get; private set; }
+
+        internal Vector3 AnimatedTranslation { get; set; }
+
+        internal Quaternion AnimatedRotation { get; set; }
+
+        private Vector3 _initialPosition;
 
     }
 }

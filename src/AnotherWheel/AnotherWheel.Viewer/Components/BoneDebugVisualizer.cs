@@ -43,7 +43,7 @@ namespace AnotherWheel.Viewer.Components {
             var vertices = new VertexPosition[pmxModel.Bones.Count];
 
             for (var i = 0; i < vertices.Length; ++i) {
-                vertices[i] = new VertexPosition(pmxModel.Bones[i].Position);
+                vertices[i] = new VertexPosition(pmxModel.Bones[i].CurrentPosition);
             }
 
             _vertices = vertices;
@@ -105,9 +105,7 @@ namespace AnotherWheel.Viewer.Components {
             var bones = pmxModel.Bones;
 
             for (var i = 0; i < bones.Count; ++i) {
-                var transformed = Vector3.Transform(bones[i].Position, bones[i].WorldMatrix);
-
-                vertices[i] = new VertexPosition(transformed);
+                vertices[i] = new VertexPosition(bones[i].CurrentPosition);
             }
 
             _vertexBuffer.SetData(vertices);

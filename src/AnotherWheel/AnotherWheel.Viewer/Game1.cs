@@ -115,9 +115,9 @@ namespace AnotherWheel.Viewer {
                 vmdMotion = VmdReader.ReadMotion(fileStream);
             }
 
-            var vmdMotionScaleFactor = TryDetectVmdScaleFactor();
+            //var vmdMotionScaleFactor = TryDetectVmdScaleFactor();
 
-            vmdMotion.Scale(vmdMotionScaleFactor);
+            //vmdMotion.Scale(vmdMotionScaleFactor);
 
             _pmxVmdAnimator.InitializeContents(pmxModel, vmdMotion);
 
@@ -169,13 +169,13 @@ namespace AnotherWheel.Viewer {
                     return defaultScaleFactor;
                 }
 
-                if (pmxBone2.ReferenceParent != pmxBone1) {
+                if (pmxBone2.ParentBone != pmxBone1) {
                     Debug.Print("The parent of PMX bone #2 (\"センター\") should be PMX bone #1 (\"全ての親\").");
 
                     return defaultScaleFactor;
                 }
 
-                var pmxRelativePosition = pmxBone2.RelativePosition;
+                var pmxRelativePosition = pmxBone2.InitialPosition - pmxBone1.InitialPosition;
                 var vmdRelativePosition = vmdBone2.Position - vmdBone1.Position;
 
                 var pmxLength = pmxRelativePosition.Length();

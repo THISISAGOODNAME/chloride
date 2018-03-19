@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 
 namespace AnotherWheel.Models.Pmx.Extensions {
@@ -8,12 +9,12 @@ namespace AnotherWheel.Models.Pmx.Extensions {
             return (bone.Flags & flag) != 0;
         }
 
-        public static void SetAnimationValue([NotNull] this PmxBone bone, Vector3 vmdPosition, Quaternion rotation) {
-            bone.Position = bone.InitialPosition + vmdPosition;
-            bone.Rotation = rotation;
+        public static void SetVmdAnimation([NotNull] this PmxBone bone, Vector3 vmdTranslation, Quaternion vmdRotation) {
+            bone.AnimatedTranslation = vmdTranslation;
+            bone.AnimatedRotation = vmdRotation;
         }
 
-        internal static void SetLocalRotationAxes([NotNull] this PmxBone bone, Vector3 localX, Vector3 localY, Vector3 localZ) {
+        internal static void SetInitialRotationFromRotationAxes([NotNull] this PmxBone bone, Vector3 localX, Vector3 localY, Vector3 localZ) {
             var rotationMatrix = new Matrix(
                 localX.X, localX.Y, localX.Z, 0,
                 localY.X, localY.Y, localY.Z, 0,
@@ -21,114 +22,78 @@ namespace AnotherWheel.Models.Pmx.Extensions {
                 0, 0, 0, 1);
 
             bone.InitialRotation = Quaternion.CreateFromRotationMatrix(rotationMatrix);
-            bone.Rotation = bone.InitialRotation;
+            bone.CurrentRotation = bone.InitialRotation;
         }
 
-        public static Matrix SetTransform(Vector3 pos, Quaternion rot) {
-            Matrix resMat = Matrix.CreateFromQuaternion(rot);
-            resMat.M41 = pos.X;
-            resMat.M42 = pos.Y;
-            resMat.M43 = pos.Z;
-            resMat.M44 = 1;
-
-            return resMat;
-        }
-
-        internal static void CalculateHierarchy([NotNull] this PmxBone bone) {
-            if (bone.HierarchyCalculated) {
+        // https://github.com/sn0w75/MMP/blob/master/libmmp/motioncontroller.cpp
+        internal static void SetToVmdPose([NotNull] this PmxBone bone) {
+            if (bone.IsTransformCalculated) {
                 return;
             }
 
-            var pos = bone.Position;
-            var rot = bone.Rotation;
+            bone.CurrentRotation = bone.AnimatedRotation;
 
-            //bone.LocalMatrix = SetTransform(pos, rot);
+            var parent = bone.ParentBone;
 
-            if (bone.ReferenceParent != null)
-            {
-                bone.ReferenceParent.CalculateHierarchy();
+            Vector3 localPosition;
 
-                bone.RelativePosition = pos - bone.ReferenceParent.Position;
-
-                //rot = bone.ReferenceParent.Rotation + rot;
-
-                // FIXME: bone.RelativePosition = pos - tail position ?
-                bone.RelativePosition = new Vector3(0f, 0f, 0f);
-
-                bone.LocalMatrix = SetTransform(bone.RelativePosition, rot);
-
-                //bone.WorldMatrix = bone.ReferenceParent.WorldMatrix * bone.LocalMatrix;
-                bone.WorldMatrix = bone.LocalMatrix;
-            }
-            else
-            {
-                bone.RelativePosition = pos;
-                //bone.RelativePosition = new Vector3(0f, 0f, 0f);
-                bone.LocalMatrix = SetTransform(bone.RelativePosition, rot);
-                bone.WorldMatrix = bone.LocalMatrix;
-            }
-
-            /**
-            var localMatrix = Matrix.CreateFromQuaternion(bone.Rotation);
-
-            Matrix worldMatrix;
-
-            var pos = bone.Position;
-
-            //pos *= 0f;
-
-            if (bone.ReferenceParent != null) {
-                bone.ReferenceParent.CalculateHierarchy();
-
-                bone.RelativePosition = pos - bone.ReferenceParent.Position;
-
-                //bone.RelativePosition = bone.ReferenceParent.Position;
-
-                worldMatrix = localMatrix * bone.ReferenceParent.WorldMatrix;
+            if (parent == null) {
+                localPosition = bone.AnimatedTranslation + bone.InitialPosition;
             } else {
-                // Already on top
-                bone.RelativePosition = pos;
-                //bone.RelativePosition = new Vector3(0f, 0f, 0f);
-                //bone.RelativePosition *= 0.0f;
-                worldMatrix = localMatrix;
+                parent.SetToVmdPose();
+                localPosition = bone.AnimatedTranslation + bone.InitialPosition - parent.InitialPosition;
             }
 
-            worldMatrix.M41 = pos.X;
-            worldMatrix.M42 = pos.Y;
-            worldMatrix.M43 = pos.Z;
-            worldMatrix.M44 = 1;
+            bone.LocalMatrix = CalculateTransform(localPosition, bone.CurrentRotation);
+            bone.WorldMatrix = bone.CalculateWorldMatrix();
 
-            bone.WorldMatrix = worldMatrix;
-
-            if (bone.ReferenceParent != null) {
-                //var invWorld = Matrix.Invert(bone.ReferenceParent.WorldMatrix);
-                //bone.LocalMatrix = worldMatrix * invWorld;
-
-                localMatrix.M41 = pos.X;
-                localMatrix.M42 = pos.Y;
-                localMatrix.M43 = pos.Z;
-                localMatrix.M44 = 1;
-
-                bone.LocalMatrix = localMatrix;
-                
-            } else {
-            }
-
-            */
-
-
-
-            bone.HierarchyCalculated = true;
+            bone.IsTransformCalculated = true;
         }
 
-        private static Matrix CalculateTransform(Vector3 translation, Quaternion rotation) {
-            var transformMatrix = Matrix.CreateFromQuaternion(rotation);
-            transformMatrix.M41 = translation.X;
-            transformMatrix.M42 = translation.Y;
-            transformMatrix.M43 = translation.Z;
-            transformMatrix.M44 = 1;
+        // Set to binding pose ("T" pose)
+        internal static void SetToBindingPose([NotNull] this PmxBone bone) {
+            if (bone.IsTransformCalculated) {
+                return;
+            }
 
-            return transformMatrix;
+            var parent = bone.ParentBone;
+
+            Vector3 localPosition;
+
+            if (parent == null) {
+                localPosition = bone.InitialPosition;
+            } else {
+                parent.SetToBindingPose();
+                localPosition = bone.InitialPosition - parent.InitialPosition;
+            }
+
+            bone.LocalMatrix = CalculateTransform(localPosition, Quaternion.Identity);
+            bone.WorldMatrix = bone.CalculateWorldMatrix();
+
+            bone.IsTransformCalculated = true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void UpdateSkinMatrix([NotNull] this PmxBone bone) {
+            bone.SkinMatrix = bone.BindPoseMatrixInverse * bone.WorldMatrix;
+            bone.CurrentPosition = Vector3.Transform(bone.InitialPosition, bone.SkinMatrix);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Matrix CalculateWorldMatrix([NotNull] this PmxBone bone) {
+            if (bone.ParentBone != null) {
+                return bone.LocalMatrix * bone.ParentBone.WorldMatrix;
+            } else {
+                return bone.LocalMatrix;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static Matrix CalculateTransform(Vector3 translation, Quaternion rotation) {
+            var translationMatrix = Matrix.CreateTranslation(translation);
+            var rotationanMatrix = Matrix.CreateFromQuaternion(rotation);
+
+            return rotationanMatrix * translationMatrix;
         }
 
     }

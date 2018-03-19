@@ -48,12 +48,12 @@ namespace AnotherWheel.Viewer.Components {
 
             Trace.Assert(renderer != null);
 
-            //UpdateVerticesCallback(renderer.Vertices);
+            UpdateVertices(renderer.Vertices);
 
-            //++_frameCounter;
+            ++_frameCounter;
         }
 
-        private void UpdateVerticesCallback([NotNull] VertexPositionNormalTexture[] vertices) {
+        private void UpdateVertices([NotNull] VertexPositionNormalTexture[] vertices) {
             var pmxModel = _pmxModel;
             var frameCounter = _frameCounter;
 
@@ -82,19 +82,19 @@ namespace AnotherWheel.Viewer.Components {
                 }
             }
 
-            // Calculate, set bone animation position/rotation, ...
+            // Calculate, set bone animated position & rotation, ...
             foreach (var pmxBone in pmxModel.Bones) {
                 if (!_currentBoneFrames.ContainsKey(pmxBone.Name)) {
                     continue;
                 }
 
                 var boneFrame = _currentBoneFrames[pmxBone.Name];
-                //var boneFrame = _lastBoneFrames[pmxBone.Name];
-                pmxBone.SetAnimationValue(boneFrame.Position, boneFrame.Rotation);
+
+                pmxBone.SetVmdAnimation(boneFrame.Position, boneFrame.Rotation);
             }
 
             // ... and update those values.
-            pmxModel.RecalculateAllBoneHierarchies();
+            pmxModel.RecalculateAllBoneInfo();
 
             // Now apply the bone transforms to our vertices.
             var vertexCount = pmxModel.Vertices.Count;
@@ -131,11 +131,10 @@ namespace AnotherWheel.Viewer.Components {
                             var pmxBone = pmxModel.Bones[boneWeights[j].BoneIndex];
                             var w = boneWeights[j].Weight / weightTotal;
 
-                            transform += pmxBone.WorldMatrix * w;
+                            transform += pmxBone.SkinMatrix * w;
                         }
 
                         var finalPos = Vector3.Transform(pmxVertex.Position, transform);
-                        finalPos = pmxVertex.Position;
 
                         // TODO: Transform normals plz.
                         var pv = pVertices + i;

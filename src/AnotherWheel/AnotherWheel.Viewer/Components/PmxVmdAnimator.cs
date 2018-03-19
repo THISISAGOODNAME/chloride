@@ -145,7 +145,9 @@ namespace AnotherWheel.Viewer.Components {
             }
         }
 
-        private static readonly float FrameRateRatio = 60f / 60f;
+        private static readonly float TargetFrameRate = 60f;
+        private const float VmdStandardFrameRate = 30f;
+        private static readonly float FrameRateRatio = TargetFrameRate / VmdStandardFrameRate;
 
         private static readonly Matrix EmptyMatrix = new Matrix(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 

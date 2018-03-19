@@ -59,6 +59,18 @@ namespace AnotherWheel.Models.Pmx {
 
         public Matrix SkinMatrix { get; internal set; }
 
+        public override string ToString() {
+            var description = GetSimpleDescription();
+
+            if (ParentBone != null) {
+                var parentInfo = $" Parent \"{ParentBone.Name}\"";
+
+                description += parentInfo;
+            }
+
+            return description;
+        }
+
         internal Matrix LocalMatrix { get; set; }
 
         internal bool IsTransformCalculated { get; set; }
@@ -68,6 +80,10 @@ namespace AnotherWheel.Models.Pmx {
         internal Vector3 AnimatedTranslation { get; set; }
 
         internal Quaternion AnimatedRotation { get; set; }
+
+        private string GetSimpleDescription() {
+            return $"Bone \"{Name}\" [{BoneIndex}] (Position: {CurrentPosition}; Rotation: {CurrentRotation})";
+        }
 
         private Vector3 _initialPosition;
 

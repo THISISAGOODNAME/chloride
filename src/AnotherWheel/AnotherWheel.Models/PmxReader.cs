@@ -162,7 +162,7 @@ namespace AnotherWheel.Models {
                 model.RootBoneIndices = rootBoneIndexList.ToArray();
 
                 foreach (var bone in bones) {
-                    bone.SetToVmdPose();
+                    bone.SetToBindingPose();
                 }
             }
 

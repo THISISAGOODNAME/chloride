@@ -43,6 +43,7 @@ namespace AnotherWheel.Viewer {
             var ksh = new KeyboardStateHandler(this);
 
             ksh.KeyHold += Ksh_KeyHold;
+            ksh.KeyDown += Ksh_KeyDown;
 
             Components.Add(ksh);
             Components.Add(new MouseCameraControl(this));
@@ -115,13 +116,16 @@ namespace AnotherWheel.Viewer {
                 vmdMotion = VmdReader.ReadMotion(fileStream);
             }
 
-            //var vmdMotionScaleFactor = TryDetectVmdScaleFactor();
+            const bool rescaleVmd = true;
 
-            //vmdMotion.Scale(vmdMotionScaleFactor);
+            if (rescaleVmd) {
+                var vmdMotionScaleFactor = TryDetectVmdScaleFactor();
+                vmdMotion.Scale(vmdMotionScaleFactor);
+            }
 
             _pmxVmdAnimator.InitializeContents(pmxModel, vmdMotion);
 
-            //_pmxVmdAnimator.Enabled = false;
+            _pmxVmdAnimator.Enabled = false;
 
             _vmdMotion = vmdMotion;
 
@@ -181,7 +185,11 @@ namespace AnotherWheel.Viewer {
                 var pmxLength = pmxRelativePosition.Length();
                 var vmdLength = vmdRelativePosition.Length();
 
-                return pmxLength / vmdLength;
+                if (vmdLength.Equals(0)) {
+                    return defaultScaleFactor;
+                } else {
+                    return pmxLength / vmdLength;
+                }
             }
         }
 
@@ -253,6 +261,20 @@ namespace AnotherWheel.Viewer {
                     break;
                 case Keys.R:
                     cam?.Reset();
+                    break;
+            }
+        }
+
+        private void Ksh_KeyDown(object sender, KeyEventArgs e) {
+            var anim = this.SimpleFindComponentOf<PmxVmdAnimator>();
+
+            if (anim == null) {
+                return;
+            }
+
+            switch (e.KeyCode) {
+                case Keys.Space:
+                    anim.Enabled = !anim.Enabled;
                     break;
             }
         }

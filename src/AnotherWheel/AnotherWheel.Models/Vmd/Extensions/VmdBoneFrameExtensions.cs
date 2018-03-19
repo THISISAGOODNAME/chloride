@@ -19,7 +19,7 @@ namespace AnotherWheel.Models.Vmd.Extensions {
             return frame;
         }
 
-        public static VmdBoneFrame Lerp([NotNull] this VmdBoneFrame thisFrame, [NotNull] VmdBoneFrame nextFrame, float t, float frameRateRatio = 1) {
+        public static VmdBoneFrame LerpTo([NotNull] this VmdBoneFrame thisFrame, [NotNull] VmdBoneFrame nextFrame, float t, float frameRateRatio = 1) {
             Debug.Assert(thisFrame.Name == nextFrame.Name, "thisFrame.Name == nextFrame.Name");
 
             t = MathHelper.Clamp(t, 0, 1);

@@ -19,7 +19,7 @@ namespace AnotherWheel.Models.Vmd {
         public byte[,,] Interpolation { get; }
 
         public override string ToString() {
-            return $"BoneFrame \"{Name}\" (Position: {Position}; Rotation: {Rotation})";
+            return $"BoneFrame \"{Name}\" FrameIndex={FrameIndex} (Position: {Position}; Rotation: {Rotation})";
         }
 
     }

@@ -77,8 +77,6 @@ namespace AnotherWheel.Viewer.Components {
                     nextBoneFrame = _boneFrameCache[name].Find(frame => frame.FrameIndex > lastBoneFrame.FrameIndex);
 
                     _lastBoneFrames[name] = lastBoneFrame;
-
-                    extendedNextBoneFrameIndex = (int)(nextBoneFrame.FrameIndex * FrameRateRatio);
                 }
 
                 var extendedLastBoneFrameIndex = (int)(lastBoneFrame.FrameIndex * FrameRateRatio);
@@ -87,6 +85,8 @@ namespace AnotherWheel.Viewer.Components {
                     // The animation of this bone has ended.
                     _currentBoneFrames[name] = lastBoneFrame.CopyWithDifferentFrameIndex(extendedLastBoneFrameIndex);
                 } else {
+                    extendedNextBoneFrameIndex = (int)(nextBoneFrame.FrameIndex * FrameRateRatio);
+
                     var t = (float)(frameCounter - extendedLastBoneFrameIndex) / (extendedNextBoneFrameIndex - extendedLastBoneFrameIndex);
                     var interpFrame = lastBoneFrame.LerpTo(nextBoneFrame, t, FrameRateRatio);
 

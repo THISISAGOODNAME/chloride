@@ -12,7 +12,7 @@ namespace AnotherWheel.Viewer {
         /// </summary>
         [STAThread]
         private static void Main([NotNull, ItemNotNull] string[] args) {
-            using (var game = new Game1()) {
+            using (var game = new AnotherWheelApp()) {
                 game.Run();
             }
         }

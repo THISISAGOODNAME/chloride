@@ -39,6 +39,14 @@ namespace AnotherWheel.Viewer.Components {
             }
 
             _boneFrameNames = _lastBoneFrames.Keys.ToArray();
+
+#if DEBUG
+            Debug.Print("VMD bone list:");
+
+            foreach (var boneFrameName in _boneFrameNames) {
+                Debug.Print(boneFrameName);
+            }
+#endif
         }
 
         public override void Update(GameTime gameTime) {

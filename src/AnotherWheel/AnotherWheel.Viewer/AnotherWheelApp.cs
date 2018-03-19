@@ -17,12 +17,16 @@ namespace AnotherWheel.Viewer {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game {
+    public class AnotherWheelApp : Game {
 
-        public Game1() {
-            _graphicsDeviceManager = new GraphicsDeviceManager(this);
+        public AnotherWheelApp() {
+            GraphicsDeviceManager = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Contents";
         }
+
+        internal GraphicsDeviceManager GraphicsDeviceManager { get; }
+
+        internal SpriteBatch SpriteBatch => _spriteBatch;
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
@@ -129,7 +133,7 @@ namespace AnotherWheel.Viewer {
 
             _vmdMotion = vmdMotion;
 
-            _boneDebugVisualizer.InitializeContents(pmxModel, camera);
+            _boneDebugVisualizer.InitializeContents(pmxModel, camera, _spriteBatch);
 
             void TryLoadTexture(string relativeFilePath) {
                 if (_modelTextures.ContainsKey(relativeFilePath)) {
@@ -279,7 +283,6 @@ namespace AnotherWheel.Viewer {
             }
         }
 
-        private GraphicsDeviceManager _graphicsDeviceManager;
         private SpriteBatch _spriteBatch;
 
         private string _modelBaseDir;

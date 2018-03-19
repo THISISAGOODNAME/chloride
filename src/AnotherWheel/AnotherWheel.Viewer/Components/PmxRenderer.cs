@@ -85,6 +85,14 @@ namespace AnotherWheel.Viewer.Components {
             }
 
             Debug.Assert(currentFaceStartIndex == pmxModel.FaceTriangles.Count, "currentFaceStartIndex == pmxModel.FaceTriangles.Count");
+
+#if DEBUG
+            Debug.Print("PMX bone list:");
+
+            foreach (var pmxBone in pmxModel.Bones) {
+                Debug.Print(pmxBone.ToString());
+            }
+#endif
         }
 
         public override void Draw(GameTime gameTime) {
@@ -106,11 +114,6 @@ namespace AnotherWheel.Viewer.Components {
             foreach (var part in _meshParts) {
                 part.Draw(graphicsDevice, world, view, projection);
             }
-        }
-
-        internal void UpdateVertices([NotNull] Action<VertexPositionNormalTexture[]> verticesUpdater) {
-            verticesUpdater?.Invoke(_vertices);
-            _vertexBuffer?.SetData(_vertices);
         }
 
         internal VertexPositionNormalTexture[] Vertices => _vertices;

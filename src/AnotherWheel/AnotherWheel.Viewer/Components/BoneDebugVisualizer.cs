@@ -1,16 +1,20 @@
-﻿using AnotherWheel.Models.Pmx;
+﻿using AnotherWheel.Models.Extensions;
+using AnotherWheel.Models.Pmx;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.Overlay;
 
 namespace AnotherWheel.Viewer.Components {
     public sealed class BoneDebugVisualizer : DrawableGameComponent {
 
         public BoneDebugVisualizer([NotNull] Game game)
             : base(game) {
+            _graphics = new Graphics(game.GraphicsDevice);
+            _fontManager = new FontManager();
         }
 
-        public void InitializeContents([NotNull] PmxModel pmxModel, [NotNull] Camera camera) {
+        public void InitializeContents([NotNull] PmxModel pmxModel, [NotNull] Camera camera, [NotNull] SpriteBatch spriteBatch) {
             _pmxModel = pmxModel;
             _camera = camera;
 
@@ -63,6 +67,13 @@ namespace AnotherWheel.Viewer.Components {
             effect.Alpha = 1.0f;
 
             _effect = effect;
+
+            _spriteBatch = spriteBatch;
+
+            _boneNameFont = _fontManager.CreateFont(DefaultUIFontFamilyName, FontStyle.Regular);
+            _boneNameFont.Size = DefaultUIFontSize;
+
+            _boneNameBrush = new SolidBrush(Color.Black);
         }
 
         public override void Draw(GameTime gameTime) {
@@ -89,12 +100,39 @@ namespace AnotherWheel.Viewer.Components {
                 pass.Apply();
                 graphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, _indexBuffer.IndexCount / 2);
             }
+
+            // Draw bone names
+            var spriteBatch = _spriteBatch;
+            var graphics = _graphics;
+            var viewProjection = camera.ViewMatrix * camera.ProjectionMatrix;
+            var viewport = graphicsDevice.Viewport;
+
+            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.LinearClamp, depthStencilState: DepthAlwaysPass, rasterizerState: RasterizerState.CullNone);
+
+            graphics.Clear(Color.Transparent);
+
+            foreach (var bone in _pmxModel.Bones) {
+                var bonePositionInScreen = WorldToScreen(viewProjection, bone.CurrentPosition, viewport, out var shouldDraw);
+
+                if (shouldDraw) {
+                    graphics.FillString(_boneNameBrush, _boneNameFont, bone.Name, bonePositionInScreen.XY());
+                }
+            }
+
+            graphics.UpdateBackBuffer();
+            spriteBatch.Draw(graphics.BackBuffer, Vector2.Zero, Color.White);
+
+            spriteBatch.End();
         }
 
         protected override void Dispose(bool disposing) {
             _effect?.Dispose();
             _vertexBuffer?.Dispose();
             _indexBuffer?.Dispose();
+
+            _boneNameBrush.Dispose();
+            _graphics.Dispose();
+            _fontManager.Dispose();
 
             base.Dispose(disposing);
         }
@@ -117,6 +155,26 @@ namespace AnotherWheel.Viewer.Components {
             DepthBufferWriteEnable = true
         };
 
+        private static Vector3 WorldToScreen(Matrix viewProjection, Vector3 worldPosition, Viewport viewport, out bool shouldDraw) {
+            var pos = new Vector4(worldPosition, 1.0f);
+            var positionTransformed = Vector4.Transform(pos, viewProjection);
+
+            if (positionTransformed.W.Equals(0)) {
+                shouldDraw = false;
+                return Vector3.Zero;
+            }
+
+            positionTransformed /= positionTransformed.W;
+
+            var x = viewport.X + (1.0f + positionTransformed.X) * viewport.Width / 2.0f;
+            var y = viewport.Y + (1.0f - positionTransformed.Y) * viewport.Height / 2.0f;
+            var z = viewport.MinDepth + positionTransformed.Z * (viewport.MaxDepth - viewport.MinDepth);
+
+            shouldDraw = viewport.MinDepth <= z && z <= viewport.MaxDepth;
+
+            return new Vector3(x, y, z);
+        }
+
         private PmxModel _pmxModel;
 
         private Camera _camera;
@@ -129,6 +187,16 @@ namespace AnotherWheel.Viewer.Components {
         private IndexBuffer _indexBuffer;
 
         private BasicEffect _effect;
+
+        private readonly Graphics _graphics;
+        private readonly FontManager _fontManager;
+        private Font _boneNameFont;
+        private SolidBrush _boneNameBrush;
+
+        private const float DefaultUIFontSize = 12f;
+        private const string DefaultUIFontFamilyName = "Microsoft YaHei";
+
+        private SpriteBatch _spriteBatch;
 
     }
 }

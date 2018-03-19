@@ -22,6 +22,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -71,7 +73,7 @@
     <Compile Include="ContentHelper.cs" />
     <Compile Include="DisposableBase.cs" />
     <Compile Include="Extensions\GameExtensions.cs" />
-    <Compile Include="Game1.cs" />
+    <Compile Include="AnotherWheelApp.cs" />
     <Compile Include="Internal\MeshPart.cs" />
     <Compile Include="MathF.cs" />
     <Compile Include="Program.cs" />
@@ -84,6 +86,14 @@
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\thirdparty\MonoGame.Extended2\Sources\MonoGame.Extended.Overlay\MonoGame.Extended.Overlay.csproj">
+      <Project>{8a716d2a-de8d-4886-bf8f-76b6b1a7bb8f}</Project>
+      <Name>MonoGame.Extended.Overlay</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\thirdparty\MonoGame.Extended2\Sources\MonoGame.Extended2\MonoGame.Extended2.csproj">
+      <Project>{c7c3d9de-41a4-4c21-98fb-336ed38a99d5}</Project>
+      <Name>MonoGame.Extended2</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AnotherWheel.Models\AnotherWheel.Models.csproj">
       <Project>{9bff6605-d890-4bbd-a02d-818315dc262b}</Project>
       <Name>AnotherWheel.Models</Name>

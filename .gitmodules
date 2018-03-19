@@ -1,0 +1,3 @@
+[submodule "thirdparty/MonoGame.Extended2"]
+	path = thirdparty/MonoGame.Extended2
+	url = https://github.com/hozuki/MonoGame.Extended2.git

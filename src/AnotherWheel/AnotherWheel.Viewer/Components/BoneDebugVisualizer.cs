@@ -14,6 +14,10 @@ namespace AnotherWheel.Viewer.Components {
             _fontManager = new FontManager();
         }
 
+        public bool SkeletonVisible { get; set; } = true;
+
+        public bool BoneNamesVisible { get; set; } = true;
+
         public void InitializeContents([NotNull] PmxModel pmxModel, [NotNull] Camera camera, [NotNull] SpriteBatch spriteBatch) {
             _pmxModel = pmxModel;
             _camera = camera;
@@ -80,49 +84,51 @@ namespace AnotherWheel.Viewer.Components {
             base.Draw(gameTime);
 
             var graphicsDevice = GraphicsDevice;
-
-            graphicsDevice.DepthStencilState = DepthAlwaysPass;
-            graphicsDevice.BlendState = BlendState.NonPremultiplied;
-            graphicsDevice.RasterizerState = RasterizerState.CullNone;
-
             var camera = _camera;
 
-            _effect.World = Matrix.Identity;
-            _effect.View = camera.ViewMatrix;
-            _effect.Projection = camera.ProjectionMatrix;
+            if (SkeletonVisible) {
+                graphicsDevice.DepthStencilState = DepthAlwaysPass;
+                graphicsDevice.BlendState = BlendState.NonPremultiplied;
+                graphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            UpdateVertexData();
+                _effect.World = Matrix.Identity;
+                _effect.View = camera.ViewMatrix;
+                _effect.Projection = camera.ProjectionMatrix;
 
-            graphicsDevice.SetVertexBuffer(_vertexBuffer);
-            graphicsDevice.Indices = _indexBuffer;
+                UpdateVertexData();
 
-            foreach (var pass in _effect.CurrentTechnique.Passes) {
-                pass.Apply();
-                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, _indexBuffer.IndexCount / 2);
-            }
+                graphicsDevice.SetVertexBuffer(_vertexBuffer);
+                graphicsDevice.Indices = _indexBuffer;
 
-            // Draw bone names
-            var spriteBatch = _spriteBatch;
-            var graphics = _graphics;
-            var viewProjection = camera.ViewMatrix * camera.ProjectionMatrix;
-            var viewport = graphicsDevice.Viewport;
-
-            spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.LinearClamp, depthStencilState: DepthAlwaysPass, rasterizerState: RasterizerState.CullNone);
-
-            graphics.Clear(Color.Transparent);
-
-            foreach (var bone in _pmxModel.Bones) {
-                var bonePositionInScreen = WorldToScreen(viewProjection, bone.CurrentPosition, viewport, out var shouldDraw);
-
-                if (shouldDraw) {
-                    graphics.FillString(_boneNameBrush, _boneNameFont, bone.Name, bonePositionInScreen.XY());
+                foreach (var pass in _effect.CurrentTechnique.Passes) {
+                    pass.Apply();
+                    graphicsDevice.DrawIndexedPrimitives(PrimitiveType.LineList, 0, 0, _indexBuffer.IndexCount / 2);
                 }
             }
 
-            graphics.UpdateBackBuffer();
-            spriteBatch.Draw(graphics.BackBuffer, Vector2.Zero, Color.White);
+            if (BoneNamesVisible) {
+                var spriteBatch = _spriteBatch;
+                var graphics = _graphics;
+                var viewProjection = camera.ViewMatrix * camera.ProjectionMatrix;
+                var viewport = graphicsDevice.Viewport;
 
-            spriteBatch.End();
+                spriteBatch.Begin(blendState: BlendState.AlphaBlend, samplerState: SamplerState.LinearClamp, depthStencilState: DepthAlwaysPass, rasterizerState: RasterizerState.CullNone);
+
+                graphics.Clear(Color.Transparent);
+
+                foreach (var bone in _pmxModel.Bones) {
+                    var bonePositionInScreen = WorldToScreen(viewProjection, bone.CurrentPosition, viewport, out var shouldDraw);
+
+                    if (shouldDraw) {
+                        graphics.FillString(_boneNameBrush, _boneNameFont, bone.Name, bonePositionInScreen.XY());
+                    }
+                }
+
+                graphics.UpdateBackBuffer();
+                spriteBatch.Draw(graphics.BackBuffer, Vector2.Zero, Color.White);
+
+                spriteBatch.End();
+            }
         }
 
         protected override void Dispose(bool disposing) {
